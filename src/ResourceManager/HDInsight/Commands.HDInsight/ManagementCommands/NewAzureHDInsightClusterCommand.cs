@@ -359,6 +359,9 @@ namespace Microsoft.Azure.Commands.HDInsight
             Configurations = new Dictionary<string, Dictionary<string, string>>();
             ScriptActions = new Dictionary<ClusterNodeType, List<AzureHDInsightScriptAction>>();
             ComponentVersion = new Dictionary<string, string>();
+            ObjectId = Guid.Empty;
+            AadTenantId = Guid.Empty;
+            CertificateFileContents = null;
         }
 
         public override void ExecuteCmdlet()
@@ -424,7 +427,12 @@ namespace Microsoft.Azure.Commands.HDInsight
                 var metastore = HiveMetastore;
                 parameters.HiveMetastore = new Metastore(metastore.SqlAzureServerName, metastore.DatabaseName, metastore.Credential.UserName, metastore.Credential.Password.ConvertToString());
             }
-            if (!string.IsNullOrEmpty(CertificatePassword))
+            if (!string.IsNullOrEmpty(CertificatePassword) ||
+                !string.IsNullOrEmpty(CertificateFilePath) ||
+                !(CertificateFileContents == null) ||
+                !AadTenantId.Equals(Guid.Empty) ||
+                !ObjectId.Equals(Guid.Empty)
+                )
             {
                 if (!string.IsNullOrEmpty(CertificateFilePath))
                 {
